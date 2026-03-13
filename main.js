@@ -7,7 +7,7 @@ const convex = new ConvexClient(import.meta.env.VITE_CONVEX_URL);
 // DOM Elements
 const authForm = document.getElementById("auth-form");
 const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
+const pinInput = document.getElementById("pin");
 const submitBtn = document.getElementById("submit-btn");
 const toggleAuthBtn = document.getElementById("toggle-auth");
 const formSubtitle = document.getElementById("form-subtitle");
@@ -48,9 +48,17 @@ toggleAuthBtn.addEventListener("click", () => {
 authForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
+    const pin = pinInput.value.trim();
 
-    if (!username || !password) return;
+    if (!username || !pin) {
+        showToast("Username and PIN are required.", "error");
+        return;
+    }
+
+    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        showToast("PIN must be 4 digits.", "error");
+        return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Processing...";
@@ -58,7 +66,7 @@ authForm.addEventListener("submit", async (e) => {
     try {
         if (isLoginMode) {
             // Login
-            const result = await convex.query("users:login", { username, password });
+            const result = await convex.query("users:login", { username, pin });
             if (result.success) {
                 showToast("Login successful!", "success");
                 setTimeout(() => {
@@ -73,7 +81,7 @@ authForm.addEventListener("submit", async (e) => {
             const isAdmin = isAdminCheckbox.checked;
             const result = await convex.mutation("users:signup", {
                 username,
-                password,
+                pin,
                 isAdmin
             });
             if (result.success) {

@@ -5,7 +5,7 @@ import { v } from "convex/values";
 export const login = query({
     args: {
         username: v.string(),
-        password: v.string(),
+        pin: v.string(),
     },
     handler: async (ctx, args) => {
         const user = await ctx.db
@@ -17,8 +17,8 @@ export const login = query({
             return { success: false, message: "User not found" };
         }
 
-        if (user.password !== args.password) {
-            return { success: false, message: "Incorrect password" };
+        if (user.pin !== args.pin) {
+            return { success: false, message: "Incorrect PIN" };
         }
 
         return {
@@ -36,7 +36,7 @@ export const login = query({
 export const signup = mutation({
     args: {
         username: v.string(),
-        password: v.string(),
+        pin: v.string(),
         isAdmin: v.boolean()
     },
     handler: async (ctx, args) => {
@@ -51,7 +51,7 @@ export const signup = mutation({
 
         const userId = await ctx.db.insert("users", {
             username: args.username,
-            password: args.password,
+            pin: args.pin,
             isAdmin: args.isAdmin
         });
 

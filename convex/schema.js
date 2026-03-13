@@ -4,7 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
     users: defineTable({
         username: v.string(),
-        password: v.string(), // In a real app we'd hash this, but we'll do plaintext for MVP
+        pin: v.string(), // 4-digit PIN for MVP
         isAdmin: v.boolean(),
     }).index("by_username", ["username"]),
 
