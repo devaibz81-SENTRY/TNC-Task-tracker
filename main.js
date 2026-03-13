@@ -8,6 +8,7 @@ const convex = new ConvexClient(import.meta.env.VITE_CONVEX_URL);
 const authForm = document.getElementById("auth-form");
 const usernameInput = document.getElementById("username");
 const pinInput = document.getElementById("pin");
+const pinGroup = document.getElementById("pin-group");
 const submitBtn = document.getElementById("submit-btn");
 const toggleAuthBtn = document.getElementById("toggle-auth");
 const formSubtitle = document.getElementById("form-subtitle");
@@ -36,11 +37,13 @@ toggleAuthBtn.addEventListener("click", () => {
         toggleAuthBtn.textContent = "Need an account? Sign Up";
         formSubtitle.textContent = "Login to your sandbox";
         adminGroup.classList.add("hidden");
+        pinGroup.classList.remove("hidden");
     } else {
         submitBtn.textContent = "Sign Up";
         toggleAuthBtn.textContent = "Already have an account? Login";
-        formSubtitle.textContent = "Create your own profile sandbox";
+        formSubtitle.textContent = "Create Name - Get assigned a PIN";
         adminGroup.classList.remove("hidden");
+        pinGroup.classList.add("hidden");
     }
 });
 
@@ -50,13 +53,13 @@ authForm.addEventListener("submit", async (e) => {
     const username = usernameInput.value.trim();
     const pin = pinInput.value.trim();
 
-    if (!username || !pin) {
-        showToast("Username and PIN are required.", "error");
+    if (!username) {
+        showToast("Username is required.", "error");
         return;
     }
 
-    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
-        showToast("PIN must be 4 digits.", "error");
+    if (isLoginMode && (!pin || pin.length !== 4)) {
+        showToast("4-digit PIN is required for Login.", "error");
         return;
     }
 
@@ -81,15 +84,23 @@ authForm.addEventListener("submit", async (e) => {
             const isAdmin = isAdminCheckbox.checked;
             const result = await convex.mutation("users:signup", {
                 username,
-                pin,
                 isAdmin
             });
             if (result.success) {
-                showToast("Account created successfully!", "success");
+                // IMPORTANT: Show the generated PIN clearly!
+                showToast(`SUCCESS! Your assigned PIN is: ${result.pin}`, "success");
+
+                // Switch to login mode automatically so they can log in with their new PIN
                 setTimeout(() => {
-                    localStorage.setItem("taskUser", JSON.stringify(result.user));
-                    window.location.href = result.user.isAdmin ? "/admin.html" : "/dashboard.html";
-                }, 800);
+                    isLoginMode = true;
+                    submitBtn.textContent = "Login";
+                    toggleAuthBtn.textContent = "Need an account? Sign Up";
+                    formSubtitle.textContent = "Account Created! Login with your new PIN";
+                    adminGroup.classList.add("hidden");
+                    pinGroup.classList.remove("hidden");
+                    pinInput.value = result.pin; // Auto-fill PIN
+                    showToast("Login now using your new PIN.", "info");
+                }, 4000);
             } else {
                 showToast(result.message, "error");
             }

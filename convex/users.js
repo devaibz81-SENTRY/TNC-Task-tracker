@@ -36,7 +36,6 @@ export const login = query({
 export const signup = mutation({
     args: {
         username: v.string(),
-        pin: v.string(),
         isAdmin: v.boolean()
     },
     handler: async (ctx, args) => {
@@ -49,14 +48,18 @@ export const signup = mutation({
             return { success: false, message: "Username already exists" };
         }
 
+        // Generate a random 4-digit PIN
+        const pin = Math.floor(1000 + Math.random() * 9000).toString();
+
         const userId = await ctx.db.insert("users", {
             username: args.username,
-            pin: args.pin,
+            pin: pin,
             isAdmin: args.isAdmin
         });
 
         return {
             success: true,
+            pin: pin, // Return the generated PIN so the user can see it
             user: {
                 _id: userId,
                 username: args.username,
