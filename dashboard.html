@@ -4,167 +4,141 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Task Tracker & OT | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>TNC Tracker — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
-    <style>
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--surface-color);
-            padding: 1rem 2rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-        }
-
-        .task-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--primary-light);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .task-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .stat-card {
-            background: var(--primary-light);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .stat-num {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-            width: auto;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container animate-fade-in">
-        <div class="top-bar">
-            <h2>Welcome, <span id="username-display">User</span></h2>
-            <div>
-                <button id="admin-link" class="btn btn-secondary btn-sm hidden"
-                    style="margin-right: 1rem; margin-top: 0;">Admin Dashboard</button>
-                <button id="logout-btn" class="btn btn-sm"
-                    style="background-color: var(--danger-color); color: white;">Logout</button>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <span class="navbar-brand">⏱ TNC Tracker</span>
+            <div class="navbar-user">
+                <div class="user-badge">
+                    <div class="user-avatar" id="user-avatar-initial">T</div>
+                    <span id="username-display">User</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" id="logout-btn"
+                    style="width:auto; margin-top:0;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Stats -->
+        <div class="stats-grid animate-fade-in" style="animation-delay:0.05s;">
+            <div class="stat-card">
+                <div class="stat-label">Today</div>
+                <div class="stat-value electric" id="stat-today">0h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Week</div>
+                <div class="stat-value accent" id="stat-week">0h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">OT This Week</div>
+                <div class="stat-value warning" id="stat-ot">0h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Tasks</div>
+                <div class="stat-value success" id="stat-active">0</div>
             </div>
         </div>
 
-        <div class="dashboard-container">
-            <!-- Sidebar: Stats & Add Task -->
-            <div class="sidebar">
-                <div class="card">
-                    <h3>Your Hours</h3>
-                    <div class="stat-card">
-                        <div class="stat-num" id="total-hours">0</div>
-                        <div>Total Hours</div>
+        <!-- Weekly Calendar -->
+        <div class="calendar-section panel animate-fade-in" style="animation-delay:0.1s;">
+            <div class="calendar-header">
+                <h3>Weekly View</h3>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <span id="week-label" style="font-size:0.82rem; color:var(--text-3);"></span>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" id="prev-week">‹</button>
+                        <button class="calendar-nav-btn" id="today-btn">Today</button>
+                        <button class="calendar-nav-btn" id="next-week">›</button>
                     </div>
-                    <div style="display: flex; gap: 1rem;">
-                        <div class="stat-card"
-                            style="flex: 1; background: var(--surface-color); border: 1px solid var(--primary-light);">
-                            <div class="stat-num" style="font-size: 1.5rem;" id="regular-hours">0</div>
-                            <div style="font-size: 0.8rem;">Regular</div>
-                        </div>
-                        <div class="stat-card"
-                            style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color);">
-                            <div class="stat-num" style="font-size: 1.5rem; color: var(--danger-color);" id="ot-hours">0
-                            </div>
-                            <div style="font-size: 0.8rem;">Overtime</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mt-1">
-                    <h3>Create Task</h3>
-                    <form id="add-task-form">
-                        <div class="form-group">
-                            <input type="text" id="task-title" required placeholder="Task Title" />
-                        </div>
-                        <div class="form-group">
-                            <textarea id="task-desc" placeholder="Description (optional)" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn">Add Task</button>
-                    </form>
                 </div>
             </div>
+            <div class="week-grid" id="week-grid"></div>
+        </div>
 
-            <!-- Main Content: Task List & Time Logging -->
-            <div class="main-content">
-                <div class="card" style="max-width: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3>My Tasks</h3>
+        <!-- Add Task -->
+        <div class="add-task-panel animate-fade-in" style="animation-delay:0.15s;">
+            <button class="add-task-toggle" id="toggle-task-form">
+                + Add New Task
+            </button>
+            <div class="panel hidden animate-slide-in" id="add-task-form-wrapper" style="margin-top:0.75rem;">
+                <h3 style="margin-bottom:1rem;">New Task</h3>
+                <form id="add-task-form">
+                    <div class="form-group">
+                        <label for="task-title">Task Title</label>
+                        <input type="text" id="task-title" required placeholder="What are you working on?" />
                     </div>
-
-                    <div id="tasks-list" class="mt-1">
-                        <!-- Tasks will be rendered here -->
-                        <p class="text-muted text-center" id="no-tasks-msg">Loading tasks...</p>
+                    <div class="form-group">
+                        <label for="task-desc">Description (optional)</label>
+                        <textarea id="task-desc" rows="2" placeholder="Brief description..."
+                            style="resize:vertical;"></textarea>
                     </div>
-                </div>
-
-                <!-- Time Log Form (Hidden by default, shown when task selected) -->
-                <div class="card mt-1 hidden" id="time-log-card"
-                    style="max-width: 100%; border-color: var(--secondary-color);">
-                    <h3>Log Time for: <span id="selected-task-title" style="color: var(--accent-color);">Task</span>
-                    </h3>
-                    <form id="log-time-form" class="mt-1">
-                        <input type="hidden" id="log-task-id" />
-                        <div style="display: flex; gap: 1rem;">
-                            <div class="form-group" style="flex: 1;">
-                                <label for="log-hours">Hours Spent</label>
-                                <input type="number" id="log-hours" step="0.5" min="0.5" required
-                                    placeholder="e.g. 2.5" />
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label for="log-date">Date</label>
-                                <input type="date" id="log-date" required />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="log-ot" style="width: auto;">
-                                Mark as Overtime (OT)
-                            </label>
-                        </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button type="submit" class="btn">Save Entry</button>
-                            <button type="button" class="btn btn-secondary" id="cancel-log-btn"
-                                style="margin-top: 0;">Cancel</button>
-                        </div>
-                    </form>
-                </div>
+                    <div style="display:flex; gap:0.75rem;">
+                        <button type="submit" class="btn btn-electric" style="flex:1;">Create Task</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1; margin-top:0;"
+                            id="cancel-task-btn">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <!-- Task List -->
+        <div class="animate-fade-in" style="animation-delay:0.2s;">
+            <div class="section-header">
+                <span class="section-title">Tasks</span>
+                <span class="section-count" id="task-count">0</span>
+            </div>
+            <div id="task-list" class="task-list">
+                <div style="text-align:center; padding: 2rem; color: var(--text-3);">Loading your tasks...</div>
+            </div>
+        </div>
+
+        <!-- Log Time Modal (hidden by default) -->
+        <div id="log-time-overlay" class="hidden" style="
+      position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+      z-index:200; display:flex; align-items:center; justify-content:center; padding:1rem;">
+            <div class="panel animate-slide-in"
+                style="width:100%; max-width:420px; background:var(--surface-1); border-radius:var(--radius-lg);">
+                <h3 style="margin-bottom:1.25rem;">Log Time</h3>
+                <form id="log-time-form">
+                    <div class="form-group">
+                        <label>Task</label>
+                        <div id="log-task-name" style="font-weight:600; color:var(--accent-light);"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="log-hours">Hours</label>
+                        <input type="number" id="log-hours" step="0.25" min="0.25" max="24" placeholder="e.g. 1.5"
+                            required />
+                    </div>
+                    <div class="form-group">
+                        <label for="log-date">Date</label>
+                        <input type="date" id="log-date" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <div class="ot-toggle">
+                            <button type="button" class="ot-btn active-regular" id="btn-regular">Regular</button>
+                            <button type="button" class="ot-btn" id="btn-ot">Overtime</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+                        <button type="submit" class="btn btn-electric" style="flex:1;">Save</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1; margin-top:0;"
+                            id="cancel-log-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
     <script type="module" src="/dashboard.js"></script>
 </body>

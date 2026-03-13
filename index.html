@@ -5,38 +5,106 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Task Tracker & OT | Login</title>
-  <!-- Modern Font: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>TNC Task Tracker — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
+  <style>
+    .brand-logo {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #818cf8, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .brand-sub {
+      font-size: 0.85rem;
+      color: var(--text-3);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .pin-reveal {
+      background: var(--surface-3);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      text-align: center;
+      display: none;
+      margin-bottom: 1.25rem;
+    }
+
+    .pin-reveal.show {
+      display: block;
+    }
+
+    .pin-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: var(--accent-light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pin-label {
+      font-size: 0.78rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .pin-hint {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      margin-top: 0.5rem;
+    }
+  </style>
 </head>
 
 <body>
   <div class="centered-container">
     <div class="card animate-fade-in">
-      <h1 class="text-center">Task Tracker</h1>
-      <p class="text-center text-muted mb-1" id="form-subtitle">Login to your sandbox</p>
+      <div class="brand-logo">TNC</div>
+      <p class="brand-sub">Task & Overtime Tracker</p>
+
+      <!-- PIN Reveal (shown after signup) -->
+      <div class="pin-reveal" id="pin-reveal">
+        <div class="pin-label">Your assigned PIN</div>
+        <div class="pin-number" id="pin-display">----</div>
+        <div class="pin-hint">Write this down — you'll need it to log in.</div>
+      </div>
+
+      <p class="text-center text-muted mb-1" id="form-subtitle" style="margin-bottom:1.5rem;">Login to your workspace
+      </p>
 
       <form id="auth-form">
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" required placeholder="Enter username" />
+          <label for="username">Name</label>
+          <input type="text" id="username" name="username" required placeholder="Enter your name" autocomplete="off" />
         </div>
 
         <div class="form-group" id="pin-group">
           <label for="pin">4-Digit PIN</label>
-          <input type="text" id="pin" name="pin" maxlength="4" inputmode="numeric" pattern="\d{4}" placeholder="0000" />
+          <input type="text" id="pin" name="pin" maxlength="4" inputmode="numeric" pattern="\d{4}" placeholder="· · · ·"
+            style="letter-spacing: 0.2em; font-size: 1.3rem; text-align: center;" />
         </div>
 
-        <!-- Registration only field: Admin Checkbox -->
+        <!-- Admin Checkbox (signup only) -->
         <div class="form-group hidden" id="admin-group">
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-            <input type="checkbox" id="isAdmin" name="isAdmin" style="width: auto;">
-            Register as Admin User
+          <label
+            style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; text-transform: none; letter-spacing: 0; font-size: 0.88rem; color: var(--text-2);">
+            <input type="checkbox" id="isAdmin" name="isAdmin" style="width: auto; accent-color: var(--accent);">
+            Register as Admin
           </label>
         </div>
 
-        <button type="submit" class="btn" id="submit-btn">Login</button>
+        <button type="submit" class="btn btn-electric" id="submit-btn" style="margin-top:0.5rem;">Login</button>
         <button type="button" class="btn btn-secondary" id="toggle-auth">Need an account? Sign Up</button>
       </form>
     </div>

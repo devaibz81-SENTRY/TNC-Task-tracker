@@ -22,6 +22,8 @@ export default defineSchema({
         hours: v.number(),
         isOvertime: v.boolean(),
         date: v.string(), // YYYY-MM-DD format
+        startTime: v.optional(v.number()), // epoch ms for stream timer
+        endTime: v.optional(v.number()),   // epoch ms for stream timer
         createdAt: v.number(),
-    }).index("by_user", ["userId"]).index("by_task", ["taskId"])
+    }).index("by_user", ["userId"]).index("by_task", ["taskId"]).index("by_date", ["userId", "date"])
 });

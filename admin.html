@@ -4,158 +4,97 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Task Tracker & OT | Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>TNC Tracker — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
-    <style>
-        .admin-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--surface-color);
-            padding: 1rem 2rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-        }
-
-        .table-container {
-            background: var(--surface-color);
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th,
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .badge {
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .badge-admin {
-            background: var(--secondary-color);
-            color: var(--bg-color);
-        }
-
-        .badge-user {
-            background: var(--primary-light);
-            color: var(--text-main);
-        }
-
-        .export-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-end;
-            background: var(--surface-color);
-            padding: 1rem 2rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-        }
-
-        .export-controls .form-group {
-            margin-bottom: 0;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-            width: auto;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="admin-container animate-fade-in">
-        <div class="top-bar">
-            <h2>Admin Gateway <span class="badge badge-admin"
-                    style="font-size: 0.5em; vertical-align: middle;">ADMIN</span></h2>
-            <div>
-                <button id="dashboard-link" class="btn btn-secondary btn-sm"
-                    style="margin-right: 1rem; margin-top: 0;">My Sandbox</button>
-                <button id="logout-btn" class="btn btn-sm"
-                    style="background-color: var(--danger-color); color: white;">Logout</button>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <span class="navbar-brand">⏱ TNC Tracker — Admin</span>
+            <div class="navbar-user">
+                <div class="user-badge">
+                    <div class="user-avatar" id="user-avatar-initial">A</div>
+                    <span id="username-display">Admin</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" id="dashboard-link" style="width:auto; margin-top:0;">My
+                    Dashboard</button>
+                <button class="btn btn-sm btn-danger" id="logout-btn" style="width:auto; margin-top:0;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container animate-fade-in">
+
+        <!-- Stats Row -->
+        <div class="stats-grid" style="margin-bottom:1.5rem;">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value accent" id="stat-users">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Platform Hours</div>
+                <div class="stat-value electric" id="stat-hours">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total OT Hours</div>
+                <div class="stat-value warning" id="stat-ot">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Tasks Completed</div>
+                <div class="stat-value success" id="stat-done">—</div>
             </div>
         </div>
 
-        <div class="card mb-1"
-            style="max-width: 100%; display: flex; justify-content: space-between; align-items: center; border-color: var(--secondary-color);">
+        <!-- Export Controls -->
+        <div class="panel"
+            style="margin-bottom:1.25rem; display:flex; flex-wrap:wrap; align-items:center; gap:1.25rem; justify-content:space-between;">
             <div>
-                <h3 style="margin-bottom: 0.5rem;">Total Users Overview</h3>
-                <p class="text-muted">Live synchronization of all platform data.</p>
+                <h3 style="margin-bottom:0.25rem;">Export Report</h3>
+                <p style="font-size:0.82rem; color:var(--text-3);">Download a CSV with your team's activity data.</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="font-size: 2rem; font-weight: bold; color: var(--accent-color); text-align: right;"
-                    id="total-platform-hours">0</div>
-                <div class="text-muted" style="line-height: 1.1;">Platform<br />Hours</div>
-            </div>
-        </div>
-
-        <div class="export-controls">
-            <div style="flex: 1;">
-                <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">Send Report (CSV Export)</h3>
-                <p class="text-muted" style="font-size: 0.9rem;">Generate exports based on specific data constraints.
-                </p>
-            </div>
-            <div class="form-group">
-                <label>Data Filter</label>
-                <select id="export-filter">
+            <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+                <select id="export-filter" style="width:auto; padding:0.55rem 0.85rem;">
                     <option value="all">All (Aggregated)</option>
-                    <option value="tasks_only">Tasks Only (Detailed)</option>
-                    <option value="time_only">Time Entries Only (Detailed)</option>
+                    <option value="tasks_only">Tasks Only</option>
+                    <option value="time_only">Time Entries Only</option>
                 </select>
+                <button id="export-btn" class="btn btn-electric" style="width:auto;">↓ Download CSV</button>
             </div>
-            <button id="export-btn" class="btn btn-sm"
-                style="background-color: var(--secondary-color); color: var(--primary-color);">Download CSV
-                Report</button>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Tasks (Done/Total)</th>
-                        <th>Regular Hours</th>
-                        <th>OT Hours</th>
-                        <th>Total Hours</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-table-body">
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">Loading user data...</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- User Table -->
+        <div class="panel" style="padding:0; overflow:hidden;">
+            <div
+                style="padding:1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+                <h3>All Users</h3>
+                <span class="section-count" id="user-count">0</span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Tasks</th>
+                            <th>Done</th>
+                            <th>Regular Hrs</th>
+                            <th>OT Hrs</th>
+                            <th>Total Hrs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted" style="padding:2rem;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
     <script type="module" src="/admin.js"></script>
 </body>

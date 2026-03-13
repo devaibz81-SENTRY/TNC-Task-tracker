@@ -20,16 +20,19 @@ if (!user.isAdmin) {
 const logoutBtn = document.getElementById("logout-btn");
 const dashboardBtn = document.getElementById("dashboard-link");
 const adminTableBody = document.getElementById("admin-table-body");
-const totalPlatformHoursEl = document.getElementById("total-platform-hours");
 const exportBtn = document.getElementById("export-btn");
 const exportFilter = document.getElementById("export-filter");
+const statUsers = document.getElementById("stat-users");
+const statHours = document.getElementById("stat-hours");
+const statOT = document.getElementById("stat-ot");
+const statDone = document.getElementById("stat-done");
+const userCount = document.getElementById("user-count");
 
 // Navigation
 logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("taskUser");
     window.location.href = "/";
 });
-
 dashboardBtn.addEventListener("click", () => {
     window.location.href = "/dashboard.html";
 });
@@ -43,45 +46,43 @@ convex.onUpdate("admin:getAdminData", {}, (data) => {
     renderTable(data);
 });
 
+function fmt(h) { return (Math.round(h * 10) / 10).toFixed(1); }
+
 function renderTable(data) {
     adminTableBody.innerHTML = "";
-
-    if (data.length === 0) {
-        adminTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No users found on the platform.</td></tr>';
+    if (!data || data.length === 0) {
+        adminTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:2rem;">No users found.</td></tr>';
         return;
     }
 
-    let grandTotalHours = 0;
+    let grandTotal = 0, grandOT = 0, grandDone = 0, totalUsers = data.length;
 
     data.forEach(u => {
-        grandTotalHours += u.totalHours;
-
-        const row = document.createElement("tr");
+        grandTotal += u.totalHours;
+        grandOT += u.otHours;
+        grandDone += u.completedTaskCount;
 
         const roleBadge = u.isAdmin
-            ? '<span class="badge badge-admin">Admin</span>'
-            : '<span class="badge badge-user">User</span>';
+            ? '<span class="task-status-badge badge-in_progress">Admin</span>'
+            : '<span class="task-status-badge badge-pending">User</span>';
 
-        row.innerHTML = `
-      <td style="font-weight: 500;">${u.username}</td>
-      <td>${roleBadge}</td>
-      <td>${u.completedTaskCount} / ${u.taskCount}</td>
-      <td>${u.regularHours}</td>
-      <td style="color: var(--danger-color);">${u.otHours > 0 ? u.otHours : '-'}</td>
-      <td style="font-weight: bold; color: var(--accent-color);">${u.totalHours}</td>
-    `;
-        adminTableBody.appendChild(row);
+        adminTableBody.innerHTML += `
+            <tr>
+                <td style="font-weight:600;">${u.username}</td>
+                <td>${roleBadge}</td>
+                <td>${u.taskCount}</td>
+                <td>${u.completedTaskCount}</td>
+                <td>${fmt(u.regularHours)}</td>
+                <td style="color:var(--warning);">${u.otHours > 0 ? fmt(u.otHours) : '—'}</td>
+                <td style="font-weight:700; color:var(--accent-light);">${fmt(u.totalHours)}</td>
+            </tr>`;
     });
 
-    // Animation effect on value update
-    totalPlatformHoursEl.style.transform = "scale(1.2)";
-    totalPlatformHoursEl.style.color = "white";
-    setTimeout(() => {
-        totalPlatformHoursEl.textContent = grandTotalHours;
-        totalPlatformHoursEl.style.transform = "scale(1)";
-        totalPlatformHoursEl.style.color = "var(--accent-color)";
-        totalPlatformHoursEl.style.transition = "all 0.3s ease";
-    }, 100);
+    if (statUsers) statUsers.textContent = totalUsers;
+    if (statHours) statHours.textContent = `${fmt(grandTotal)}h`;
+    if (statOT) statOT.textContent = `${fmt(grandOT)}h`;
+    if (statDone) statDone.textContent = grandDone;
+    if (userCount) userCount.textContent = totalUsers;
 }
 
 // Export / Send Report Functionality
