@@ -102,10 +102,61 @@
             </div>
         </div>
 
+        <!-- Day Detail Panel (shown when a calendar day is clicked) -->
+        <div id="day-detail-panel" class="panel hidden animate-slide-in"
+            style="margin-bottom:1.5rem; border-color:var(--accent);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                <div>
+                    <h3 id="day-detail-title" style="margin-bottom:0.1rem;">Monday, March 10</h3>
+                    <p style="font-size:0.8rem; color:var(--text-3); margin:0;" id="day-detail-hours">No time logged</p>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn btn-sm btn-electric" style="width:auto;" id="day-log-btn">+ Log Time</button>
+                    <button class="btn btn-sm btn-secondary" style="width:auto;" id="day-detail-close">✕</button>
+                </div>
+            </div>
+            <div id="day-entry-list" style="display:flex; flex-direction:column; gap:0.5rem;">
+                <div style="color:var(--text-3); font-size:0.88rem; text-align:center; padding:0.75rem;">No entries for
+                    this day.</div>
+            </div>
+        </div>
+
+        <!-- Task Analytics Modal -->
+        <div id="analytics-overlay" class="hidden" style="
+          position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+          z-index:300; display:flex; align-items:center; justify-content:center; padding:1rem;">
+            <div class="panel animate-slide-in"
+                style="width:100%; max-width:500px; background:var(--surface-1); border-radius:var(--radius-lg);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
+                    <h3 id="analytics-task-name" style="max-width:80%; overflow:hidden; text-overflow:ellipsis;">Task
+                        Analytics</h3>
+                    <button id="close-analytics" class="btn btn-sm btn-secondary"
+                        style="width:auto; margin-top:0;">✕</button>
+                </div>
+                <div class="stats-grid" style="margin-bottom:1.25rem; grid-template-columns:repeat(3,1fr);">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Hours</div>
+                        <div class="stat-value electric" id="analytics-total">0h</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Regular</div>
+                        <div class="stat-value accent" id="analytics-reg">0h</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Overtime</div>
+                        <div class="stat-value warning" id="analytics-ot">0h</div>
+                    </div>
+                </div>
+                <div class="stat-label" style="margin-bottom:0.5rem;">Time Log History</div>
+                <div id="analytics-entries"
+                    style="max-height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:0.4rem;"></div>
+            </div>
+        </div>
+
         <!-- Log Time Modal (hidden by default) -->
         <div id="log-time-overlay" class="hidden" style="
-      position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
-      z-index:200; display:flex; align-items:center; justify-content:center; padding:1rem;">
+          position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+          z-index:200; display:flex; align-items:center; justify-content:center; padding:1rem;">
             <div class="panel animate-slide-in"
                 style="width:100%; max-width:420px; background:var(--surface-1); border-radius:var(--radius-lg);">
                 <h3 style="margin-bottom:1.25rem;">Log Time</h3>
@@ -113,6 +164,7 @@
                     <div class="form-group">
                         <label>Task</label>
                         <div id="log-task-name" style="font-weight:600; color:var(--accent-light);"></div>
+                        <select id="log-task-select" class="hidden" style="margin-top:0.4rem;"></select>
                     </div>
                     <div class="form-group">
                         <label for="log-hours">Hours</label>
