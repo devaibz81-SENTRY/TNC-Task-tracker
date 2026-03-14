@@ -140,7 +140,7 @@ function renderCalendar(entries) {
 
     weekLabel.textContent = `${MONTHS[days[0].getMonth()]} ${days[0].getDate()} — ${MONTHS[days[6].getMonth()]} ${days[6].getDate()}`;
 
-    // Build per-day data: { reg, ot, tasks: [{taskId, title, hours, isOT}] }
+    // Build per-day data keyed by date string
     const dayMap = {};
     entries.forEach(e => {
         if (!dayMap[e.date]) dayMap[e.date] = { reg: 0, ot: 0, taskMap: {} };
@@ -150,43 +150,47 @@ function renderCalendar(entries) {
             : dayMap[e.date].taskMap[e.taskId].reg += e.hours;
     });
 
-    const maxH = Math.max(...days.map(d => {
-        const k = d.toISOString().slice(0, 10);
-        return dayMap[k] ? dayMap[k].reg + dayMap[k].ot : 0;
-    }), 1);
-
     weekGrid.innerHTML = days.map((d, i) => {
         const k = d.toISOString().slice(0, 10);
         const data = dayMap[k];
         const total = data ? data.reg + data.ot : 0;
-        const heat = Math.min((total / maxH) * 100, 100);
         const isToday = k === today;
-        const isSelected = k === selectedDate;
+        const isSel = k === selectedDate;
 
-        // Task chips (up to 2 visible + overflow count)
-        let chips = '';
-        if (data && data.taskMap) {
-            const taskKeys = Object.keys(data.taskMap);
-            const shown = taskKeys.slice(0, 2);
-            shown.forEach(tid => {
+        // Task blocks for this day
+        let blocksHtml = '';
+        if (data && Object.keys(data.taskMap).length > 0) {
+            Object.entries(data.taskMap).forEach(([tid, th]) => {
                 const t = taskById(tid);
-                const th = data.taskMap[tid];
-                const label = t ? t.title.slice(0, 12) : 'Task';
-                chips += `<div style="font-size:0.65rem; background:var(--surface-3); border-radius:4px; padding:1px 4px; color:var(--accent-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;">${label} ${fmtH(th.reg + th.ot)}</div>`;
+                const label = t ? t.title.slice(0, 14) : 'Task';
+                const hasOT = th.ot > 0;
+                // Regular block
+                if (th.reg > 0) {
+                    blocksHtml += `<div class="task-block" title="${t ? t.title : ''}: ${fmtH(th.reg)} regular">${label} ${fmtH(th.reg)}</div>`;
+                }
+                // OT block separate
+                if (th.ot > 0) {
+                    blocksHtml += `<div class="task-block ot-block" title="${t ? t.title : ''}: ${fmtH(th.ot)} OT">OT ${label} ${fmtH(th.ot)}</div>`;
+                }
             });
-            if (taskKeys.length > 2) chips += `<div style="font-size:0.65rem; color:var(--text-3);">+${taskKeys.length - 2} more</div>`;
+        } else {
+            blocksHtml = `<div class="task-block empty-block">—</div>`;
         }
 
+        const totalStr = total > 0
+            ? `${fmtH(data.reg)} reg${data.ot > 0 ? ` +${fmtH(data.ot)} OT` : ''}`
+            : '';
+        const hasOT = data && data.ot > 0;
+
         return `
-      <div class="day-cell ${isToday ? 'today' : ''} ${total > 0 ? 'has-hours' : ''} ${isSelected ? 'selected-day' : ''}"
-           style="${isSelected ? 'border-color:var(--electric);box-shadow:0 0 0 1px var(--electric);' : ''} cursor:pointer;"
+      <div class="day-col ${isToday ? 'today-col' : ''} ${isSel ? 'selected-col' : ''}"
            onclick="window.selectDay('${k}')">
-        <div class="day-name">${DAYS[i]}</div>
-        <div class="day-date">${d.getDate()}</div>
-        ${chips}
-        ${total > 0 ? `<div class="day-hours">${fmtH(total)}</div>` : ''}
-        ${data && data.ot > 0 ? `<div class="day-ot">+${fmtH(data.ot)} OT</div>` : ''}
-        <div class="day-heat"><div class="day-heat-bar" style="width:${heat}%"></div></div>
+        <div class="day-col-header">
+          <div class="day-col-name">${DAYS[i]}</div>
+          <div class="day-col-date">${d.getDate()}</div>
+        </div>
+        ${totalStr ? `<div class="day-col-total ${hasOT ? 'has-ot' : ''}">${totalStr}</div>` : ''}
+        <div class="day-col-body">${blocksHtml}</div>
       </div>`;
     }).join('');
 }
