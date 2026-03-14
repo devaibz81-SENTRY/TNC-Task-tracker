@@ -317,7 +317,7 @@ addTaskForm.addEventListener("submit", async (e) => {
     const btn = addTaskForm.querySelector("button[type='submit']");
     btn.disabled = true;
     try {
-        await convex.mutation("tasks:createTask", { userId: user._id, title, description, status: "pending", createdAt: Date.now() });
+        await convex.mutation("tasks:createTask", { userId: user._id, title, description });
         taskTitleInput.value = "";
         taskDescInput.value = "";
         addTaskWrapper.classList.add("hidden");
