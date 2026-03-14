@@ -68,93 +68,151 @@ class _LoginScreenState extends State<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'TNC',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900,
-                  foreground: Paint()..shader = LinearGradient(
-                    colors: [colorScheme.primary, colorScheme.secondary],
-                  ).createShader(const Rect.fromLTWH(0, 0, 200, 70)),
-                ),
-              ),
-              const Text('Task & Overtime Tracker', style: TextStyle(color: Colors.white70)),
-              const SizedBox(height: 48),
-
-              if (_assignedPin != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colorScheme.secondary),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text('Your assigned PIN', style: TextStyle(fontSize: 12, color: Colors.white60)),
-                      Text(
-                        _assignedPin!['pin'],
-                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: colorScheme.secondary),
-                      ),
-                      const Text('Write this down to log in!', style: TextStyle(fontSize: 12, color: Colors.white60)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_isLogin)
-                TextField(
-                  controller: _pinController,
-                  obscureText: true,
-                  keyboardType: TextInputType.number,
-                  maxLength: 4,
-                  decoration: const InputDecoration(
-                    labelText: '4-Digit PIN',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                ),
-
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleAuth,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(_isLogin ? 'Login' : 'Sign Up'),
-                ),
-              ),
-              TextButton(
-                onPressed: () => setState(() {
-                  _isLogin = !_isLogin;
-                  _assignedPin = null;
-                }),
-                child: Text(_isLogin ? 'Need an account? Sign Up' : 'Already have an account? Login'),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topLeft,
+            radius: 1.5,
+            colors: [
+              colorScheme.primary.withOpacity(0.1),
+              colorScheme.background,
             ],
           ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo Section
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [colorScheme.primary, colorScheme.secondary],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withOpacity(0.3),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      )
+                    ],
+                  ),
+                  child: const Icon(Icons.bolt, size: 60, color: Colors.white),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'TNC TRACKER',
+                  style: GoogleFonts.outfit(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    foreground: Paint()..shader = LinearGradient(
+                      colors: [Colors.white, Colors.white.withOpacity(0.7)],
+                    ).createShader(const Rect.fromLTWH(0, 0, 200, 70)),
+                  ),
+                ),
+                const Text('Precision Time Management', style: TextStyle(color: Colors.white30, letterSpacing: 1)),
+                const SizedBox(height: 64),
+
+                if (_assignedPin != null) ...[
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 500),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Opacity(opacity: value, child: child),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: colorScheme.secondary.withOpacity(0.5)),
+                      ),
+                      child: Column(
+                        children: [
+                          const Text('YOUR ASSIGNED PIN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white54)),
+                          const SizedBox(height: 8),
+                          Text(
+                            _assignedPin!['pin'],
+                            style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: colorScheme.secondary, letterSpacing: 8),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text('Please save this for future logins', style: TextStyle(fontSize: 11, color: Colors.white38)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+
+                _buildTextField(_nameController, 'Username', Icons.person_outline),
+                const SizedBox(height: 20),
+                if (_isLogin)
+                  _buildTextField(_pinController, '4-Digit PIN', Icons.lock_outline, isPassword: true, isNumber: true),
+
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleAuth,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 8,
+                      shadowColor: colorScheme.primary.withOpacity(0.5),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Text(_isLogin ? 'LOG IN' : 'GET STARTED', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => setState(() {
+                    _isLogin = !_isLogin;
+                    _assignedPin = null;
+                  }),
+                  child: Text(
+                    _isLogin ? "DON'T HAVE AN ACCOUNT? SIGN UP" : "ALREADY TRACKING? LOG IN",
+                    style: TextStyle(color: colorScheme.secondary, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool isPassword = false, bool isNumber = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        maxLength: isNumber ? 4 : null,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          counterText: '',
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+          prefixIcon: Icon(icon, color: Colors.white38),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
     );
